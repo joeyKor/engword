@@ -16,6 +16,8 @@ class _SettingsPageState extends State<SettingsPage> {
       List.generate(3, (_) => TextEditingController());
   final List<TextEditingController> _meaningControllers =
       List.generate(3, (_) => TextEditingController());
+  final List<TextEditingController> _exampleControllers =
+      List.generate(3, (_) => TextEditingController());
 
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
@@ -43,9 +45,11 @@ class _SettingsPageState extends State<SettingsPage> {
           if (i < _selectedDayWords.length) {
             _wordControllers[i].text = _selectedDayWords[i]['word'];
             _meaningControllers[i].text = _selectedDayWords[i]['meaning'];
+            _exampleControllers[i].text = _selectedDayWords[i]['example'] ?? '';
           } else {
             _wordControllers[i].clear();
             _meaningControllers[i].clear();
+            _exampleControllers[i].clear();
           }
         }
       });
@@ -55,6 +59,7 @@ class _SettingsPageState extends State<SettingsPage> {
         for (int i = 0; i < 3; i++) {
           _wordControllers[i].clear();
           _meaningControllers[i].clear();
+          _exampleControllers[i].clear();
         }
       });
     }
@@ -67,6 +72,7 @@ class _SettingsPageState extends State<SettingsPage> {
         words.add({
           'word': _wordControllers[i].text,
           'meaning': _meaningControllers[i].text,
+          'example': _exampleControllers[i].text,
         });
       }
 
@@ -129,25 +135,39 @@ class _SettingsPageState extends State<SettingsPage> {
                     Text('Word ${index + 1}',
                         style: const TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold)),
-                    TextFormField(
-                      controller: _wordControllers[index],
-                      decoration: const InputDecoration(labelText: 'Word'),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter a word';
-                        }
-                        return null;
-                      },
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: _wordControllers[index],
+                            decoration: const InputDecoration(labelText: 'Word'),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter a word';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: TextFormField(
+                            controller: _meaningControllers[index],
+                            decoration:
+                                const InputDecoration(labelText: 'Meaning'),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter a meaning';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                     TextFormField(
-                      controller: _meaningControllers[index],
-                      decoration: const InputDecoration(labelText: 'Meaning'),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter a meaning';
-                        }
-                        return null;
-                      },
+                      controller: _exampleControllers[index],
+                      decoration: const InputDecoration(labelText: 'Example'),
                     ),
                     const SizedBox(height: 20),
                   ],

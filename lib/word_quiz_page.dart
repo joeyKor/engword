@@ -57,6 +57,7 @@ class _WordQuizPageState extends State<WordQuizPage> {
 
   // Set up the controllers and focus nodes for the current word.
   void _setupWord() {
+    if (_words.isEmpty) return;
     _controllers = List.generate(
       _words[_currentIndex]['word'].length,
       (index) => TextEditingController(),
@@ -66,13 +67,32 @@ class _WordQuizPageState extends State<WordQuizPage> {
       (index) => FocusNode(),
     );
     // Request focus for the first text field
-    _focusNodes[0].requestFocus();
+    if (_focusNodes.isNotEmpty) {
+      _focusNodes[0].requestFocus();
+    }
     _speak();
   }
 
-  // Speak the current word.
+  String _getMaskedExample() {
+    if (_words.isEmpty) return '';
+    final word = _words[_currentIndex]['word'] as String;
+    final example = _words[_currentIndex]['example'] as String?;
+    if (example == null || example.isEmpty) {
+      return 'No example available.';
+    }
+    return example.replaceAll(RegExp(word, caseSensitive: false), '?????');
+  }
+
+  // Speak the full example sentence.
   Future<void> _speak() async {
-    await flutterTts.speak(_words[_currentIndex]['word']);
+    if (_words.isEmpty) return;
+    final example = _words[_currentIndex]['example'] as String?;
+    final word = _words[_currentIndex]['word'] as String;
+    if (example != null && example.isNotEmpty) {
+      await flutterTts.speak(example);
+    } else {
+      await flutterTts.speak(word);
+    }
   }
 
   // Check the user's answer.
@@ -99,9 +119,8 @@ class _WordQuizPageState extends State<WordQuizPage> {
 
   // Show a dialog to confirm the entered word.
   void _showConfirmationDialog() {
-    String enteredWord = _controllers
-        .map((controller) => controller.text)
-        .join();
+    String enteredWord =
+        _controllers.map((controller) => controller.text).join();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -156,15 +175,23 @@ class _WordQuizPageState extends State<WordQuizPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        'Meaning: ${_words[_currentIndex]['meaning']}',
-                        style: const TextStyle(fontSize: 24),
+                      Expanded(
+                        child: Text(
+                          _getMaskedExample(),
+                          style: const TextStyle(fontSize: 24),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                       IconButton(
                         icon: const Icon(Icons.volume_up),
                         onPressed: _speak,
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Meaning: ${_words[_currentIndex]['meaning']}',
+                    style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic),
                   ),
                   const SizedBox(height: 20),
                   RawKeyboardListener(
