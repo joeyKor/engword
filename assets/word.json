@@ -1,0 +1,202 @@
+[
+  {
+    "word": "apple",
+    "meaning": "사과"
+  },
+  {
+    "word": "banana",
+    "meaning": "바나나"
+  },
+  {
+    "word": "orange",
+    "meaning": "오렌지"
+  },
+  {
+    "word": "grape",
+    "meaning": "포도"
+  },
+  {
+    "word": "watermelon",
+    "meaning": "수박"
+  },
+  {
+    "word": "strawberry",
+    "meaning": "딸기"
+  },
+  {
+    "word": "peach",
+    "meaning": "복숭아"
+  },
+  {
+    "word": "pear",
+    "meaning": "배"
+  },
+  {
+    "word": "cherry",
+    "meaning": "체리"
+  },
+  {
+    "word": "plum",
+    "meaning": "자두"
+  },
+  {
+    "word": "book",
+    "meaning": "책"
+  },
+  {
+    "word": "desk",
+    "meaning": "책상"
+  },
+  {
+    "word": "chair",
+    "meaning": "의자"
+  },
+  {
+    "word": "pencil",
+    "meaning": "연필"
+  },
+  {
+    "word": "pen",
+    "meaning": "펜"
+  },
+  {
+    "word": "notebook",
+    "meaning": "공책"
+  },
+  {
+    "word": "eraser",
+    "meaning": "지우개"
+  },
+  {
+    "word": "ruler",
+    "meaning": "자"
+  },
+  {
+    "word": "bag",
+    "meaning": "가방"
+  },
+  {
+    "word": "school",
+    "meaning": "학교"
+  },
+  {
+    "word": "student",
+    "meaning": "학생"
+  },
+  {
+    "word": "teacher",
+    "meaning": "선생님"
+  },
+  {
+    "word": "friend",
+    "meaning": "친구"
+  },
+  {
+    "word": "love",
+    "meaning": "사랑"
+  },
+  {
+    "word": "happy",
+    "meaning": "행복한"
+  },
+  {
+    "word": "sad",
+    "meaning": "슬픈"
+  },
+  {
+    "word": "angry",
+    "meaning": "화난"
+  },
+  {
+    "word": "good",
+    "meaning": "좋은"
+  },
+  {
+    "word": "bad",
+    "meaning": "나쁜"
+  },
+  {
+    "word": "big",
+    "meaning": "큰"
+  },
+  {
+    "word": "small",
+    "meaning": "작은"
+  },
+  {
+    "word": "hot",
+    "meaning": "더운"
+  },
+  {
+    "word": "cold",
+    "meaning": "추운"
+  },
+  {
+    "word": "sun",
+    "meaning": "태양"
+  },
+  {
+    "word": "moon",
+    "meaning": "달"
+  },
+  {
+    "word": "star",
+    "meaning": "별"
+  },
+  {
+    "word": "sky",
+    "meaning": "하늘"
+  },
+  {
+    "word": "water",
+    "meaning": "물"
+  },
+  {
+    "word": "fire",
+    "meaning": "불"
+  },
+  {
+    "word": "tree",
+    "meaning": "나무"
+  },
+  {
+    "word": "flower",
+    "meaning": "꽃"
+  },
+  {
+    "word": "cat",
+    "meaning": "고양이"
+  },
+  {
+    "word": "dog",
+    "meaning": "개"
+  },
+  {
+    "word": "bird",
+    "meaning": "새"
+  },
+  {
+    "word": "fish",
+    "meaning": "물고기"
+  },
+  {
+    "word": "house",
+    "meaning": "집"
+  },
+  {
+    "word": "car",
+    "meaning": "자동차"
+  },
+  {
+    "word": "computer",
+    "meaning": "컴퓨터"
+  },
+  {
+    "word": "phone",
+    "meaning": "전화기"
+  },
+  {
+    "word": "time",
+    "meaning": "시간"
+  }
+]
