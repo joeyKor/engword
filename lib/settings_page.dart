@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:engword/local_storage_service.dart'; // Import the new service
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -22,6 +23,7 @@ class _SettingsPageState extends State<SettingsPage> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   List<Map<String, dynamic>> _selectedDayWords = [];
+  final LocalStorageService _localStorageService = LocalStorageService(); // Instantiate the service
 
   @override
   void initState() {
@@ -83,6 +85,12 @@ class _SettingsPageState extends State<SettingsPage> {
             .collection('daily_words')
             .doc(dateStr)
             .set({'words': words});
+        
+        // Also update local storage
+        Map<String, dynamic> localWordsMap = await _localStorageService.readWords();
+        localWordsMap[dateStr] = words;
+        await _localStorageService.writeWords(localWordsMap);
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Words saved successfully!')),
         );

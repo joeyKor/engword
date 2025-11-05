@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:intl/intl.dart';
+import 'package:engword/local_storage_service.dart'; // Import the new service
 
 // WordQuizPage is the main page of the application where the quiz happens.
 class WordQuizPage extends StatefulWidget {
@@ -23,6 +24,7 @@ class _WordQuizPageState extends State<WordQuizPage> {
       []; // Controllers for the text fields.
   List<FocusNode> _focusNodes = []; // Focus nodes for the text fields.
   FlutterTts flutterTts = FlutterTts();
+  final LocalStorageService _localStorageService = LocalStorageService(); // Instantiate the service
 
   @override
   void initState() {
@@ -34,25 +36,40 @@ class _WordQuizPageState extends State<WordQuizPage> {
 // Load words from Firestore for the current date, or from the local JSON if not available.
   Future<void> _loadWords() async {
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    final doc = await FirebaseFirestore.instance.collection('daily_words').doc(today).get();
+    Map<String, dynamic> localWordsMap = await _localStorageService.readWords();
+    List<dynamic> wordsForToday = [];
 
-    if (doc.exists && doc.data() != null) {
-      final data = doc.data()!['words'] as List;
-      setState(() {
-        _words = List<Map<String, dynamic>>.from(data);
-        _words.shuffle();
-        _setupWord();
-      });
-    } else {
-      // Fallback to local JSON
-      final String response = await rootBundle.loadString('assets/word.json');
-      final data = await json.decode(response);
-      setState(() {
-        _words = data;
-        _words.shuffle(); // Shuffle the words for a random quiz.
-        _setupWord();
-      });
+    // Try to fetch from Firebase
+    try {
+      final doc = await FirebaseFirestore.instance.collection('daily_words').doc(today).get();
+      if (doc.exists && doc.data() != null) {
+        wordsForToday = doc.data()!['words'] as List;
+        // Update local storage with Firebase data for today
+        localWordsMap[today] = wordsForToday;
+        await _localStorageService.writeWords(localWordsMap);
+        print("Words loaded from Firebase and updated local storage.");
+      } else {
+        // If not in Firebase, try to load from local storage
+        if (localWordsMap.containsKey(today)) {
+          wordsForToday = localWordsMap[today] as List;
+          print("Words loaded from local storage (Firebase had no data for today).");
+        } else {
+          print("No words found for today in Firebase or local storage.");
+        }
+      }
+    } catch (e) {
+      print("Error fetching from Firebase: $e. Loading from local storage.");
+      // Fallback to local storage if Firebase fetch fails
+      if (localWordsMap.containsKey(today)) {
+        wordsForToday = localWordsMap[today] as List;
+      }
     }
+
+    setState(() {
+      _words = List<Map<String, dynamic>>.from(wordsForToday);
+      _words.shuffle();
+      _setupWord();
+    });
   }
 
   // Set up the controllers and focus nodes for the current word.
@@ -104,11 +121,21 @@ class _WordQuizPageState extends State<WordQuizPage> {
       });
       // Move to the next word after a short delay.
       Future.delayed(const Duration(seconds: 1), () {
-        setState(() {
-          _currentIndex = (_currentIndex + 1) % _words.length;
-          _message = '';
-          _setupWord();
-        });
+        if (_currentIndex == _words.length - 1) {
+          // Last word, so mark as complete
+          final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+          _localStorageService.addLearningDate(today);
+          setState(() {
+            _message = 'Quiz finished for today!';
+          });
+          // Optionally navigate away or show a summary
+        } else {
+          setState(() {
+            _currentIndex++;
+            _message = '';
+            _setupWord();
+          });
+        }
       });
     } else {
       setState(() {

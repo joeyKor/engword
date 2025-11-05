@@ -1,17 +1,19 @@
-[
-  {
-    "word": "apple",
-    "meaning": "사과",
-    "example": "An apple a day keeps the doctor away."
-  },
-  {
-    "word": "banana",
-    "meaning": "바나나",
-    "example": "I like to eat a banana for breakfast."
-  },
-  {
-    "word": "cherry",
-    "meaning": "체리",
-    "example": "The cherry on top makes it perfect."
-  }
-]
+{
+  "2025-11-05": [
+    {
+      "word": "apple",
+      "meaning": "사과",
+      "example": "An apple a day keeps the doctor away."
+    },
+    {
+      "word": "banana",
+      "meaning": "바나나",
+      "example": "I like to eat a banana for breakfast."
+    },
+    {
+      "word": "cherry",
+      "meaning": "체리",
+      "example": "The cherry on top makes it perfect."
+    }
+  ]
+}
