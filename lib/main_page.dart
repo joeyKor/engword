@@ -1,4 +1,4 @@
-
+import 'package:engword/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'word_quiz_page.dart';
 
@@ -10,6 +10,17 @@ class MainPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('EngWord'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsPage()),
+              );
+            },
+          ),
+        ],
       ),
       body: Center(
         child: ElevatedButton(

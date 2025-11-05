@@ -1,9 +1,10 @@
-
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:intl/intl.dart';
 
 // WordQuizPage is the main page of the application where the quiz happens.
 class WordQuizPage extends StatefulWidget {
@@ -16,26 +17,42 @@ class WordQuizPage extends StatefulWidget {
 class _WordQuizPageState extends State<WordQuizPage> {
   List _words = []; // List to hold the words from the JSON file.
   int _currentIndex = 0; // Index of the current word in the quiz.
-  String _message = ''; // Message to show to the user (e.g., "Correct!", "Incorrect.").
-  List<TextEditingController> _controllers = []; // Controllers for the text fields.
+  String _message =
+      ''; // Message to show to the user (e.g., "Correct!", "Incorrect.").
+  List<TextEditingController> _controllers =
+      []; // Controllers for the text fields.
   List<FocusNode> _focusNodes = []; // Focus nodes for the text fields.
   FlutterTts flutterTts = FlutterTts();
 
   @override
   void initState() {
     super.initState();
+    flutterTts.setLanguage("en-US");
     _loadWords();
   }
 
-  // Load words from the assets/word.json file.
+// Load words from Firestore for the current date, or from the local JSON if not available.
   Future<void> _loadWords() async {
-    final String response = await rootBundle.loadString('assets/word.json');
-    final data = await json.decode(response);
-    setState(() {
-      _words = data;
-      _words.shuffle(); // Shuffle the words for a random quiz.
-      _setupWord();
-    });
+    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    final doc = await FirebaseFirestore.instance.collection('daily_words').doc(today).get();
+
+    if (doc.exists && doc.data() != null) {
+      final data = doc.data()!['words'] as List;
+      setState(() {
+        _words = List<Map<String, dynamic>>.from(data);
+        _words.shuffle();
+        _setupWord();
+      });
+    } else {
+      // Fallback to local JSON
+      final String response = await rootBundle.loadString('assets/word.json');
+      final data = await json.decode(response);
+      setState(() {
+        _words = data;
+        _words.shuffle(); // Shuffle the words for a random quiz.
+        _setupWord();
+      });
+    }
   }
 
   // Set up the controllers and focus nodes for the current word.
@@ -82,8 +99,9 @@ class _WordQuizPageState extends State<WordQuizPage> {
 
   // Show a dialog to confirm the entered word.
   void _showConfirmationDialog() {
-    String enteredWord =
-        _controllers.map((controller) => controller.text).join();
+    String enteredWord = _controllers
+        .map((controller) => controller.text)
+        .join();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -126,17 +144,15 @@ class _WordQuizPageState extends State<WordQuizPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('English Word Quiz'),
-      ),
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(title: const Text('English Word Quiz')),
       body: _words.isEmpty
           ? const Center(child: CircularProgressIndicator())
           : Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  // Display the meaning of the current word.
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -151,7 +167,6 @@ class _WordQuizPageState extends State<WordQuizPage> {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  // Listen for backspace key presses to handle clearing text fields.
                   RawKeyboardListener(
                     focusNode: FocusNode(),
                     onKey: (event) {
@@ -167,14 +182,13 @@ class _WordQuizPageState extends State<WordQuizPage> {
                         }
                       }
                     },
-                    // Display the text fields for the letters of the word.
                     child: Wrap(
                       alignment: WrapAlignment.center,
                       spacing: 8.0,
                       runSpacing: 8.0,
                       children: List.generate(
                         _words[_currentIndex]['word'].length,
-                        (index) => Container(
+                        (index) => SizedBox(
                           width: 50,
                           height: 50,
                           child: TextField(
@@ -185,22 +199,22 @@ class _WordQuizPageState extends State<WordQuizPage> {
                             decoration: InputDecoration(
                               counterText: '',
                               border: const OutlineInputBorder(),
-                              filled: true, // Enable filling the background
+                              filled: true,
                               fillColor: _controllers[index].text.isNotEmpty
-                                  ? Colors.grey[700] // Lighter color when filled
-                                  : Colors.grey[850], // Default color
+                                  ? Colors.grey[700]
+                                  : Colors.grey[850],
                             ),
                             onChanged: (value) {
                               if (value.isNotEmpty &&
                                   index < _focusNodes.length - 1) {
                                 _focusNodes[index + 1].requestFocus();
                               }
-                              // If all fields are filled, show the confirmation dialog.
                               if (_controllers.every(
-                                  (controller) => controller.text.isNotEmpty)) {
+                                (controller) => controller.text.isNotEmpty,
+                              )) {
                                 _showConfirmationDialog();
                               }
-                              setState(() {}); // Rebuild to update the color
+                              setState(() {});
                             },
                           ),
                         ),
@@ -208,13 +222,11 @@ class _WordQuizPageState extends State<WordQuizPage> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  // Button to submit the answer.
                   ElevatedButton(
                     onPressed: _checkAnswer,
                     child: const Text('Submit'),
                   ),
                   const SizedBox(height: 20),
-                  // Display the message to the user.
                   Text(
                     _message,
                     style: TextStyle(
